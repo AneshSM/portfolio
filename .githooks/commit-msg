@@ -1,0 +1,47 @@
+#!/bin/sh
+# commit-msg hook: require a Conventional Commits prefix on the first line.
+#
+# Git runs this hook after you write a commit message and passes the path of
+# the file holding that message as $1. Exiting non-zero aborts the commit.
+#
+# Accepted:  <type>(<optional scope>)<optional !>: <description>
+#   feat: add archived repo pointers
+#   fix(repos): correct clone path
+#   docs!: restructure AGENTS.md
+
+msg_file="$1"
+
+# First line of the message, with any Windows carriage return removed.
+subject=$(head -n 1 "$msg_file" | tr -d '\r')
+
+# Let git's own generated messages through untouched. Merge subjects are
+# matched in the exact forms git writes, so a hand-written "Merge stuff"
+# still has to follow the rule.
+case "$subject" in
+  "Merge branch '"* | "Merge branches '"* | "Merge remote-tracking branch '"* | \
+  "Merge tag '"* | "Merge commit '"* | \
+  "Revert \""* | "fixup! "* | "squash! "* | "amend! "*) exit 0 ;;
+esac
+
+types="feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
+
+# ^(types)        one of the allowed types
+# (\([a-z0-9._/-]+\))?  optional scope in parentheses, e.g. (repos)
+# !?              optional "!" marking a breaking change
+# : .*[^ ]        colon, one space, then a description with a non-space character
+pattern="^($types)(\([a-z0-9._/-]+\))?!?: .*[^ ]"
+
+if printf '%s\n' "$subject" | grep -Eq "$pattern"; then
+  exit 0
+fi
+
+cat >&2 <<EOF
+✗ Commit rejected: the first line must start with a type prefix.
+
+  Got:      $subject
+  Expected: <type>(<scope>): <description>
+
+  Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
+  Example: feat(repos): add archived repo pointers
+EOF
+exit 1

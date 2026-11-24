@@ -1,0 +1,65 @@
+#!/bin/sh
+# pre-commit hook: keep employer names and personal data out of commits.
+#
+# Scans the lines each staged file adds. Two pattern sources:
+#   1. Built in: Indian mobile numbers (+91 optional).
+#   2. Private: one extended regex per line (case-insensitive) in
+#      .git/info/private-patterns. That file sits inside .git, so it is never
+#      committed and every worktree shares it. Put employer and product names,
+#      home address fragments and pincodes there. Lines starting with # are
+#      comments. PRIVACY_PATTERNS_FILE overrides the path (used by tests).
+#
+
+exempt_re='^$' # no exempt folders in this public repo
+phone_re='(^|[^0-9])(\+91[ -]?)?[6-9][0-9]{4}[ -]?[0-9]{5}([^0-9]|$)'
+
+common_dir=$(git rev-parse --path-format=absolute --git-common-dir) || exit 1
+patterns="${PRIVACY_PATTERNS_FILE:-$common_dir/info/private-patterns}"
+
+if [ -f "$patterns" ]; then
+  # Drop comments and blank lines (and CRs) so grep -f gets clean patterns.
+  active=$(mktemp) || exit 1
+  trap 'rm -f "$active"' EXIT
+  tr -d '\r' <"$patterns" | grep -Ev '^[[:space:]]*(#|$)' >"$active"
+else
+  active=""
+  printf 'pre-commit: no private pattern file at %s; only the built-in phone check ran.\n' "$patterns" >&2
+fi
+
+found=0
+files=$(git -c core.quotepath=off diff --cached --name-only --diff-filter=ACMR)
+
+# Newline-separated names; IFS keeps spaces inside a name.
+old_ifs=$IFS
+IFS='
+'
+for f in $files; do
+  IFS=$old_ifs
+  if printf '%s\n' "$f" | grep -Eq "$exempt_re"; then continue; fi
+  added=$(git diff --cached -U0 --no-color -- "$f" | grep '^+' | grep -v '^+++' | cut -c2-)
+  [ -n "$added" ] || continue
+  hits=$(printf '%s\n' "$added" | grep -E -- "$phone_re")
+  if [ -n "$active" ] && [ -s "$active" ]; then
+    hits="$hits
+$(printf '%s\n' "$added" | grep -Ei -f "$active")"
+  fi
+  hits=$(printf '%s\n' "$hits" | grep -v '^$')
+  if [ -n "$hits" ]; then
+    found=1
+    printf '\n  %s\n' "$f" >&2
+    printf '%s\n' "$hits" | sed 's/^/    + /' >&2
+  fi
+done
+IFS=$old_ifs
+
+[ $found = 0 ] && exit 0
+
+cat >&2 <<'EOF'
+
+✗ Commit blocked: staged lines above match a private pattern (employer
+  name, phone number or home address).
+
+  Fix: rewrite at capability level (docs/profile-readme/adr/0001), or move the
+  file under docs/profile-readme/ or explorations/ if it belongs there.
+EOF
+exit 1
