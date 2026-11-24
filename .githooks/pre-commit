@@ -59,7 +59,7 @@ cat >&2 <<'EOF'
 ✗ Commit blocked: staged lines above match a private pattern (employer
   name, phone number or home address).
 
-  Fix: rewrite at capability level (docs/profile-readme/adr/0001), or move the
-  file under docs/profile-readme/ or explorations/ if it belongs there.
+  Fix: rewrite at capability level (docs/adr/0004). Private values belong in
+  the gitignored content/private.local.json, never in tracked files.
 EOF
 exit 1
