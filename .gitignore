@@ -1,0 +1,27 @@
+# Dependencies and builds
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Env and local secrets
+.env*
+!.env.example
+
+# Private résumé data and output: never committed (docs/adr/0003)
+content/private.local.json
+*.private.pdf
+private/
+
+# Tool output
+.vercel/
+.playwright-mcp/
+playwright-report/
+test-results/
+.lighthouseci/
+.evidence/
+.claude/settings.local.json
+.claude/worktrees/
