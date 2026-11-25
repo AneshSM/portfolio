@@ -1,3 +1,7 @@
+# LF everywhere, so Prettier's check passes on Windows checkouts too
+* text=auto eol=lf
+*.ico binary
+
 # Hook scripts must keep Unix line endings to run in sh
 .githooks/* text eol=lf
 *.sh text eol=lf
