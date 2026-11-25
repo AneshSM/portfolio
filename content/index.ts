@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { publicContent } from './public';
+import { siteCopy, siteCopySchema, type SiteCopy } from './site';
 import {
   parseTrackedContent,
   privateValuesSchema,
@@ -59,11 +60,20 @@ export function getResume(
 ): Resume | null {
   const tracked = parseTrackedContent(publicContent);
   if (edition === 'public') return resolve(tracked, {});
-  if (!existsSync(privateFile)) return null;
+  // The private file is read at build or script time only and must never be
+  // traced into a deployment, so Turbopack is told to skip these paths.
+  if (!existsSync(/* turbopackIgnore: true */ privateFile)) return null;
   const values = privateValuesSchema.parse(
-    JSON.parse(readFileSync(privateFile, 'utf8')),
+    JSON.parse(readFileSync(/* turbopackIgnore: true */ privateFile, 'utf8')),
   );
   return resolve(tracked, values);
+}
+
+export type { SiteCopy } from './site';
+
+/** Page copy that is not résumé data: section titles, labels, placeholders. */
+export function getSiteCopy(): SiteCopy {
+  return siteCopySchema.parse(siteCopy);
 }
 
 type Field = Tracked['basics']['phone'];
