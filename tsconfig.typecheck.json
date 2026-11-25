@@ -1,0 +1,5 @@
+{
+  "//": "next dev writes .next/dev/types with unused imports, which noUnusedLocals rejects. next build skips them too (next/dist/lib/typescript/runTypeCheck.js).",
+  "extends": "./tsconfig.json",
+  "exclude": ["node_modules", ".next/dev"]
+}
