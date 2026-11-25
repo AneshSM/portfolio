@@ -4,6 +4,7 @@ test("home page loads and has a level-1 heading", async ({ page }) => {
   const response = await page.goto("/");
 
   expect(response?.ok()).toBe(true);
-  await expect(page.locator("h1")).toHaveCount(1);
-  await expect(page.locator("h1")).toBeVisible();
+  const heading = page.locator("h1");
+  await expect(heading).toHaveCount(1);
+  await expect(heading).toBeVisible();
 });
