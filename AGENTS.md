@@ -5,7 +5,7 @@ My portfolio site and résumé. This repo is **public**: everything committed he
 - **Build target:** `docs/spec.md`. **Decisions:** `docs/adr/`. Read both before starting a ticket.
 - **Work:** GitHub Issues on `AneshSM/portfolio` (`gh issue list`). `ready-for-agent` issues are yours. `ready-for-human` ones need the owner (Vercel, accounts, private data). Close an issue from its PR (`Closes #n`).
 - **Method:** test-first, one ticket per PR. A PR is done when lint, typecheck, test and build pass and Playwright has checked the page at desktop and mobile, in light and dark. Put that evidence in the PR body.
-- **Commands:** `npm run check` runs everything CI runs: `lint`, `format:check`, `typecheck`, `test` (Vitest, once) and `build`. CI also runs `npm audit`. `npm run format` fixes formatting. While working, run `npx vitest run <file>` and `npm run typecheck`. `npm run e2e` runs the Playwright smoke test against a production build at desktop and mobile, in light and dark. Run `npx playwright install chromium` once first. `npm run dev` starts the dev server.
+- **Commands:** `npm run check` runs everything CI runs: `lint`, `format:check`, `typecheck`, `test` (Vitest, once) and `build`. CI also runs `npm audit`. `npm run format` fixes formatting. While working, run `npx vitest run <file>` and `npm run typecheck`. `npm run e2e` runs the Playwright smoke test against a production build at desktop and mobile, in light and dark. Run `npx playwright install chromium` once first. `npm run lhci` builds the site and runs Lighthouse CI (gates in `lighthouserc.json`) with the mobile and desktop presets, as CI does; it needs Chrome installed and writes reports to `lighthouse-reports/`. `npm run dev` starts the dev server.
 
 ## Content rules
 
