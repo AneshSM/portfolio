@@ -75,16 +75,24 @@ function orderProblems(text: string, expected: string[]): string[] {
   return problems;
 }
 
-/** The text a reader (or an ATS) should meet, top to bottom. */
+/**
+ * The text a reader (or an ATS) should meet, top to bottom. Private fields
+ * (phone, seeking line, employer names) are expected only when the edition
+ * has them, so the private PDF is checked for them too.
+ */
 export function resumeTextInOrder(resume: Resume): string[] {
+  const present = (...values: (string | undefined)[]) =>
+    values.filter((value): value is string => Boolean(value));
   return [
     resume.basics.name,
     resume.basics.label,
+    ...present(resume.basics.phone, resume.basics.seeking),
     'Summary',
     resume.basics.summary,
     'Experience',
     ...resume.work.flatMap((job) => [
       job.position,
+      ...present(job.name),
       ...job.highlights.map((highlight) => highlight.text),
     ]),
     'Projects',
