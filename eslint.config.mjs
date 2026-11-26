@@ -31,6 +31,8 @@ const eslintConfig = defineConfig([
     'coverage/**',
     'playwright-report/**',
     'test-results/**',
+    // Agent worktrees nested in this checkout.
+    '.claude/**',
   ]),
 ]);
 

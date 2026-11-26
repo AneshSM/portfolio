@@ -10,17 +10,26 @@
     "typecheck": "next typegen && tsc --noEmit -p tsconfig.typecheck.json",
     "test": "vitest run",
     "e2e": "playwright test",
+    "lhci": "npm run build && npm run lhci:mobile && npm run lhci:desktop",
+    "lhci:mobile": "npx --yes @lhci/cli@0.16.1 autorun",
+    "lhci:desktop": "npx --yes @lhci/cli@0.16.1 autorun --collect.settings.preset=desktop --upload.outputDir=lighthouse-reports/desktop",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prebuild": "tsx scripts/build-resume.mts",
+    "resume:private": "tsx scripts/build-private-resume.mts"
   },
   "dependencies": {
+    "@vercel/analytics": "2.0.1",
     "next": "16.4.6",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.1",
     "@playwright/test": "^1.65.1",
+    "@react-pdf/renderer": "4.9.1",
     "@tailwindcss/turbopack": "4.3.5",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^8.0.0",
@@ -35,8 +44,10 @@
     "jsdom": "^31.0.1",
     "prettier": "^3.10.1",
     "tailwindcss": "4.3.5",
+    "tsx": "4.23.15",
     "typescript": "~6.0",
     "typescript-eslint": "^8.74.0",
+    "unpdf": "2.2.2",
     "vitest": "^5.1.2"
   },
   "engines": {

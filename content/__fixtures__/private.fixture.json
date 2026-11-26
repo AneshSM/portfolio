@@ -1,0 +1,11 @@
+{
+  "basics": {
+    "phone": "PHONE-PLACEHOLDER",
+    "seeking": "SEEKING-PLACEHOLDER"
+  },
+  "work": {
+    "software-engineer": { "name": "EMPLOYER-PLACEHOLDER" },
+    "associate-software-engineer": { "name": "EMPLOYER-PLACEHOLDER" },
+    "intern": { "name": "EMPLOYER-PLACEHOLDER" }
+  }
+}
