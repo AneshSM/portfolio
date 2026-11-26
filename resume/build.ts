@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { getResume, type Resume } from '@/content';
+import { getResume, type Edition, type Resume } from '@/content';
 import {
   checkResumePdf,
   privateValuesIn,
@@ -23,7 +23,7 @@ export async function buildPublicResume(
   { privateFixture }: { privateFixture: string },
 ): Promise<{ bytes: number }> {
   const resume = getResume('public', { privateFile: privateFixture });
-  return buildChecked('Public', resume, outFile, {
+  return buildChecked('public', resume, outFile, {
     forbidden: privateValuesIn(privateFixture),
   });
 }
@@ -54,11 +54,16 @@ export async function buildPrivateResume(
 ): Promise<{ bytes: number }> {
   const resume = getResume('private', { privateFile });
   if (!resume) throw new MissingPrivateFileError(privateFile);
-  return buildChecked('Private', resume, outFile, { forbidden: [] });
+  return buildChecked('private', resume, outFile, { forbidden: [] });
 }
 
+const EDITION_LABELS: Record<Edition, string> = {
+  public: 'Public',
+  private: 'Private',
+};
+
 async function buildChecked(
-  label: string,
+  edition: Edition,
   resume: Resume,
   outFile: string,
   { forbidden }: Pick<CheckOptions, 'forbidden'>,
@@ -70,7 +75,7 @@ async function buildChecked(
   });
   if (problems.length > 0) {
     throw new Error(
-      `${label} résumé failed its checks:\n- ${problems.join('\n- ')}`,
+      `${EDITION_LABELS[edition]} résumé failed its checks:\n- ${problems.join('\n- ')}`,
     );
   }
   mkdirSync(path.dirname(outFile), { recursive: true });

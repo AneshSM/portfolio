@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { extractText, getMeta } from 'unpdf';
 import type { Resume } from '@/content';
+import { getBuildingProjects } from '@/content/projects';
 
 /**
  * Build checks for a résumé PDF (ADR 0002). Each returns a readable problem;
@@ -17,23 +18,31 @@ export type CheckOptions = {
 
 const MAX_BYTES = 2.5 * 1024 * 1024;
 
-const normalise = (text: string) => text.replace(/\s+/g, ' ').trim();
+/** Collapses every run of whitespace to one space, as text is compared. */
+export function normaliseWhitespace(text: string): string {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+/** A PDF's text, all pages merged, with whitespace normalised. */
+export async function readPdfText(
+  pdf: Uint8Array,
+): Promise<{ text: string; totalPages: number }> {
+  // unpdf may transfer (detach) the buffer it is given, so pass a copy.
+  const { text, totalPages } = await extractText(new Uint8Array(pdf), {
+    mergePages: true,
+  });
+  return { text: normaliseWhitespace(text), totalPages };
+}
 
 export async function checkResumePdf(
   pdf: Uint8Array,
   { inOrder, forbidden, maxBytes = MAX_BYTES }: CheckOptions,
 ): Promise<string[]> {
-  // unpdf may transfer (detach) the buffer it is given, so pass copies.
-  const { text: raw, totalPages } = await extractText(new Uint8Array(pdf), {
-    mergePages: true,
-  });
-  const text = normalise(raw);
+  const { text, totalPages } = await readPdfText(pdf);
   const meta = await getMeta(new Uint8Array(pdf));
-  // unpdf does not ship the pdf.js type for XMP metadata; this is its shape.
-  const xmp = meta.metadata as { getAll(): Record<string, unknown> } | null;
   const metadata: [string, unknown][] = [
     ...Object.entries(meta.info),
-    ...Object.entries(xmp?.getAll() ?? {}),
+    ...readXmpFields(meta.metadata),
   ];
 
   return [
@@ -43,7 +52,7 @@ export async function checkResumePdf(
     ...(pdf.byteLength < maxBytes
       ? []
       : [`file is ${pdf.byteLength} bytes; the cap is ${maxBytes}`]),
-    ...orderProblems(text, inOrder.map(normalise)),
+    ...findOrderProblems(text, inOrder.map(normaliseWhitespace)),
     ...forbidden
       .filter((value) => text.includes(value))
       .map((value) => `private value in text: "${value}"`),
@@ -57,7 +66,28 @@ export async function checkResumePdf(
   ];
 }
 
-function orderProblems(text: string, expected: string[]): string[] {
+// unpdf does not ship the pdf.js type for XMP metadata, so its shape is
+// checked at runtime instead of asserted.
+type XmpMetadata = { getAll(): unknown };
+
+function isXmpMetadata(value: unknown): value is XmpMetadata {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'getAll' in value &&
+    typeof value.getAll === 'function'
+  );
+}
+
+function readXmpFields(xmp: unknown): [string, unknown][] {
+  if (!isXmpMetadata(xmp)) return [];
+  const fields = xmp.getAll();
+  return typeof fields === 'object' && fields !== null
+    ? Object.entries(fields)
+    : [];
+}
+
+function findOrderProblems(text: string, expected: string[]): string[] {
   const problems: string[] = [];
   let cursor = 0;
   expected.forEach((part, i) => {
@@ -81,24 +111,23 @@ function orderProblems(text: string, expected: string[]): string[] {
  * has them, so the private PDF is checked for them too.
  */
 export function resumeTextInOrder(resume: Resume): string[] {
-  const present = (...values: (string | undefined)[]) =>
+  const { basics } = resume;
+  const keepDefined = (...values: (string | undefined)[]) =>
     values.filter((value): value is string => Boolean(value));
   return [
-    resume.basics.name,
-    resume.basics.label,
-    ...present(resume.basics.phone, resume.basics.seeking),
+    basics.name,
+    basics.label,
+    ...keepDefined(basics.phone, basics.seeking),
     'Summary',
-    resume.basics.summary,
+    basics.summary,
     'Experience',
     ...resume.work.flatMap((job) => [
       job.position,
-      ...present(job.name),
+      ...keepDefined(job.name),
       ...job.highlights.map((highlight) => highlight.text),
     ]),
     'Projects',
-    ...resume.projects
-      .filter((project) => project.status === 'building')
-      .map((project) => project.name),
+    ...getBuildingProjects(resume).map((project) => project.name),
     'Skills',
     ...resume.skills.map((group) => group.name),
     'Education',
@@ -108,11 +137,11 @@ export function resumeTextInOrder(resume: Resume): string[] {
 
 /** Every string value in a private values file (ADR 0003). */
 export function privateValuesIn(file: string): string[] {
-  const strings = (value: unknown): string[] =>
+  const collectStrings = (value: unknown): string[] =>
     typeof value === 'string'
       ? [value]
       : value && typeof value === 'object'
-        ? Object.values(value).flatMap(strings)
+        ? Object.values(value).flatMap(collectStrings)
         : [];
-  return [...new Set(strings(JSON.parse(readFileSync(file, 'utf8'))))];
+  return [...new Set(collectStrings(JSON.parse(readFileSync(file, 'utf8'))))];
 }
