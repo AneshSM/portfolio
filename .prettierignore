@@ -4,6 +4,8 @@ coverage/
 playwright-report/
 test-results/
 .evidence/
+.lighthouseci/
+lighthouse-reports/
 package-lock.json
 next-env.d.ts
 .claude/

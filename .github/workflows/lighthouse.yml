@@ -1,0 +1,42 @@
+name: Lighthouse
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse (mobile and desktop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # Lighthouse CI against `next start`; assertions live in lighthouserc.json.
+      # These are the steps `npm run lhci` chains locally, split so desktop
+      # still runs (and reports) when mobile fails.
+      - id: mobile
+        run: npm run lhci:mobile
+      - if: ${{ success() || steps.mobile.outcome == 'failure' }}
+        run: npm run lhci:desktop
+      - name: Upload Lighthouse reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: lighthouse-reports/
+          if-no-files-found: warn
+          retention-days: 30
