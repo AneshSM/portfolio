@@ -1,5 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
-import { describe, expect, test } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { describe, expect, test, vi } from 'vitest';
 import { resume, site } from './__fixtures__/content';
 import { Experience } from './experience';
 import { Hero } from './hero';
@@ -65,6 +65,25 @@ describe('Hero', () => {
       'href',
       'mailto:fixture@example.com',
     );
+  });
+
+  test('the résumé link downloads the PDF instead of opening it', () => {
+    render(<Hero resume={resume} site={site} />);
+
+    expect(
+      screen.getByRole('link', { name: 'Fixture résumé' }),
+    ).toHaveAttribute('download', 'Fixture-Resume.pdf');
+  });
+
+  test('copies the email address for visitors without a mail app', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    render(<Hero resume={resume} site={site} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Fixture copy' }));
+
+    expect(writeText).toHaveBeenCalledWith('fixture@example.com');
+    expect(await screen.findByText('Fixture copied')).toBeInTheDocument();
   });
 });
 
@@ -242,8 +261,17 @@ describe('Contact', () => {
       within(section).getByRole('link', { name: 'Fixture contact email' }),
     ).toHaveAttribute('href', 'mailto:fixture@example.com');
     expect(
+      within(section).getByText('fixture@example.com'),
+    ).toBeInTheDocument();
+    expect(
+      within(section).getByRole('button', { name: 'Fixture copy' }),
+    ).toBeInTheDocument();
+    expect(
       within(section).getByRole('link', { name: 'Fixture résumé' }),
     ).toHaveAttribute('href', '/fixture.pdf');
+    expect(
+      within(section).getByRole('link', { name: 'Fixture résumé' }),
+    ).toHaveAttribute('download', 'Fixture-Resume.pdf');
     expect(
       within(section).getByRole('link', { name: 'FixNet' }),
     ).toHaveAttribute('href', 'https://fixnet.example.com/fixer');

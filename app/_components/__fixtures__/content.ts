@@ -72,8 +72,13 @@ export const site: SiteCopy = {
   navLabel: 'Fixture nav',
   hero: {
     sentence: 'Fixture hero sentence.',
-    resume: { label: 'Fixture résumé', href: '/fixture.pdf' },
+    resume: {
+      label: 'Fixture résumé',
+      href: '/fixture.pdf',
+      fileName: 'Fixture-Resume.pdf',
+    },
     emailLabel: 'Fixture email',
+    copyEmail: { label: 'Fixture copy', done: 'Fixture copied' },
   },
   projects: {
     id: 'fx-projects',

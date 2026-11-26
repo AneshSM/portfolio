@@ -54,6 +54,36 @@ test('résumé and email links are present', async ({ page }) => {
   );
 });
 
+test('the résumé button downloads the PDF instead of opening it', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('link', { name: 'Download résumé (PDF)' }).first().click(),
+  ]);
+  expect(download.suggestedFilename()).toBe(
+    'Anesh-Somanath-Majalikar-Resume.pdf',
+  );
+});
+
+test('copy email puts the address on the clipboard', async ({
+  page,
+  context,
+  browserName,
+}) => {
+  test.skip(browserName !== 'chromium', 'clipboard permissions are Chromium');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Copy email' }).first().click();
+  await expect(page.getByText('Email address copied').first()).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
+    'aneshsm204@gmail.com',
+  );
+});
+
 test('earlier learning is collapsed until opened', async ({ page }) => {
   await page.goto('/');
 
