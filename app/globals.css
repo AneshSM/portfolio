@@ -1,23 +1,108 @@
 @import 'tailwindcss';
 
+/*
+ * Palette from the GitHub profile README banner (AneshSM/aneshsm): warm paper,
+ * monochrome ink, no accent hue. Every text colour is at least 7:1 on the page
+ * and on the surface colour in its theme. The rule colour is decoration only.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --paper: #f5f2eb;
+  --surface: #ebe6dc;
+  --ink-strong: #141414;
+  --ink: #2e2e2e;
+  --ink-muted: #4a4744;
+  --ink-hand: #3f3c39;
+  --rule: #8f897f;
+  --focus: #1c1c1c;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #1d1d1f;
+    --surface: #262628;
+    --ink-strong: #f7f6f3;
+    --ink: #dedbd4;
+    --ink-muted: #b8b4ab;
+    --ink-hand: #bdb9b0;
+    --rule: #6a6761;
+    --focus: #efede8;
   }
 }
 
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-hand: var(--ink-hand);
+  --color-rule: var(--rule);
+  /* The banner's system stack: no webfont for body text. */
+  --font-sans:
+    'Segoe UI', Ubuntu, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-hand: var(--font-patrick-hand), 'Segoe Print', 'Bradley Hand', cursive;
+}
+
+html {
+  color-scheme: light dark;
+  scroll-behavior: smooth;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+h1,
+h2,
+h3 {
+  color: var(--ink-strong);
+}
+
+a {
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-thickness 150ms ease-out;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* main takes focus from the skip link; it needs no ring of its own. */
+main:focus {
+  outline: none;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(0.5rem);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* Movement only, never opacity, so the hero paints at once (LCP). */
+.animate-rise {
+  animation: rise 500ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

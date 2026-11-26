@@ -22,18 +22,18 @@ export function SitePage({ resume, site }: SectionProps) {
     <>
       <a
         href={`#${MAIN_ID}`}
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:p-2"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-10 focus:rounded-md focus:bg-paper focus:p-2"
       >
         {site.skipLink}
       </a>
       <header className="mx-auto w-full max-w-3xl px-6 pt-6">
         <nav aria-label={site.navLabel}>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+          <ul className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold text-ink-strong">
             {sections.map(({ id, title }) => (
               <li key={id}>
                 <a
                   href={`#${id}`}
-                  className="underline-offset-4 hover:underline"
+                  className="inline-flex min-h-6 items-center py-1 hover:underline"
                 >
                   {title}
                 </a>
