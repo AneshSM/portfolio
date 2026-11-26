@@ -45,7 +45,13 @@ describe('capability-level content (ADR 0004)', () => {
     const prose = [
       site.hero.sentence,
       site.contact.lead,
-      ...site.howIBuild.paragraphs,
+      site.howIBuild.claim,
+      ...site.howIBuild.loop.steps,
+      ...site.howIBuild.guardrails.items,
+      ...site.howIBuild.verification.checks,
+      site.howIBuild.failure.text,
+      site.howIBuild.example.text,
+      site.howIBuild.setup.text,
     ];
 
     expect(prose.filter((text) => /\d/.test(text))).toEqual([]);
