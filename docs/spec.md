@@ -41,7 +41,7 @@ The proof is this repo: its `AGENTS.md`, ADRs, commit history and pull requests 
 - **Theme:** light and dark follow the system setting. No toggle in v1.
 - **Motion:** subtle, and off under `prefers-reduced-motion`.
 - **Social preview:** an OG image from the README banner, plus title and description, `sitemap.xml`, `robots.txt` and a canonical URL.
-- **Address:** `https://aneshsm-portfolio.vercel.app`, on Vercel Hobby and deployed from `main`. It's the canonical URL until a custom domain lands (see Later).
+- **Address:** `https://aneshsm-portfolio.vercel.app`, on Vercel Hobby and deployed from `main`. It's the canonical URL until a custom domain lands (see Later). The GitHub profile README links to it (AneshSM/aneshsm#17).
 - **Analytics:** Vercel Web Analytics (no cookies, no consent banner).
 
 ## Targets (launch gates)
@@ -69,4 +69,3 @@ The proof is this repo: its `AGENTS.md`, ADRs, commit history and pull requests 
 - A theme toggle.
 - A Claude API "Ask about me" chat.
 - A public "Claude Code setup" template repo.
-- A "Portfolio" link in the GitHub profile README (separate PR, after launch).
