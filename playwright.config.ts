@@ -38,6 +38,7 @@ export default defineConfig({
     command: `npm run build && npm run start -- --port ${port}`,
     url: baseURL,
     reuseExistingServer: false,
-    timeout: 180_000,
+    // Build plus the résumé prebuild can pass 3 minutes on a loaded Windows machine.
+    timeout: 300_000,
   },
 });
