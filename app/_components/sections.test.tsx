@@ -100,20 +100,81 @@ describe('Projects', () => {
 });
 
 describe('HowIBuild', () => {
-  test('shows the placeholder paragraphs and the link to the proof', () => {
+  test('shows the seven parts in the spec order, under their own headings', () => {
     render(<HowIBuild resume={resume} site={site} />);
 
     const section = screen.getByRole('region', { name: 'Fixture How' });
     expect(section).toHaveAttribute('id', 'fx-how');
+    expect(within(section).getByText('Fixture claim.')).toBeInTheDocument();
     expect(
-      within(section).getByText('Fixture paragraph one.'),
+      within(section)
+        .getAllByRole('heading', { level: 3 })
+        .map((heading) => heading.textContent),
+    ).toEqual([
+      'Fixture loop',
+      'Fixture guardrails',
+      'Fixture verification',
+      'Fixture failure',
+      'Fixture example',
+      'Fixture setup',
+    ]);
+    expect(
+      within(section).getByText('Fixture setup text.'),
+    ).toBeInTheDocument();
+  });
+
+  test('lists the loop steps in order and the guardrails', () => {
+    render(<HowIBuild resume={resume} site={site} />);
+
+    const [loop, guardrails, checks] = within(
+      screen.getByRole('region', { name: 'Fixture How' }),
+    ).getAllByRole('list');
+    expect(loop.tagName).toBe('OL');
+    expect(
+      within(loop)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Fixture plan', 'Fixture build']);
+    expect(
+      within(guardrails)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Fixture rule', 'Fixture hook']);
+    expect(within(checks).getByText('Fixture check')).toBeInTheDocument();
+  });
+
+  test('shows one real output verbatim, with where it came from', () => {
+    render(<HowIBuild resume={resume} site={site} />);
+
+    const section = screen.getByRole('region', { name: 'Fixture How' });
+    const output = section.querySelector('pre');
+    expect(output?.textContent).toBe('Fixture output\n  2 passed');
+    expect(
+      within(section).getByRole('link', { name: 'Fixture output source' }),
+    ).toHaveAttribute('href', 'https://github.example.com/pr/2');
+  });
+
+  test('links the failure, the worked example and the proof', () => {
+    render(<HowIBuild resume={resume} site={site} />);
+
+    const section = screen.getByRole('region', { name: 'Fixture How' });
+    expect(
+      within(section).getByText('Fixture failure story.'),
     ).toBeInTheDocument();
     expect(
-      within(section).getByText('Fixture paragraph two.'),
+      within(section).getByText('Fixture example story.'),
     ).toBeInTheDocument();
-    expect(
-      within(section).getByRole('link', { name: 'Fixture proof' }),
-    ).toHaveAttribute('href', 'https://github.example.com/proof');
+    for (const [name, href] of [
+      ['Fixture failure fix', 'https://github.example.com/pr/1'],
+      ['Fixture design', 'https://github.example.com/pr/3'],
+      ['Fixture build', 'https://github.example.com/pr/4'],
+      ['Fixture proof', 'https://github.example.com/proof'],
+    ]) {
+      expect(within(section).getByRole('link', { name })).toHaveAttribute(
+        'href',
+        href,
+      );
+    }
   });
 });
 

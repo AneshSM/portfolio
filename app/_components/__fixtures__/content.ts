@@ -85,7 +85,40 @@ export const site: SiteCopy = {
   howIBuild: {
     id: 'fx-how',
     title: 'Fixture How',
-    paragraphs: ['Fixture paragraph one.', 'Fixture paragraph two.'],
+    claim: 'Fixture claim.',
+    loop: { title: 'Fixture loop', steps: ['Fixture plan', 'Fixture build'] },
+    guardrails: {
+      title: 'Fixture guardrails',
+      items: ['Fixture rule', 'Fixture hook'],
+    },
+    verification: {
+      title: 'Fixture verification',
+      checks: ['Fixture check'],
+      output: {
+        text: 'Fixture output\n  2 passed',
+        source: {
+          label: 'Fixture output source',
+          href: 'https://github.example.com/pr/2',
+        },
+      },
+    },
+    failure: {
+      title: 'Fixture failure',
+      text: 'Fixture failure story.',
+      link: {
+        label: 'Fixture failure fix',
+        href: 'https://github.example.com/pr/1',
+      },
+    },
+    example: {
+      title: 'Fixture example',
+      text: 'Fixture example story.',
+      links: [
+        { label: 'Fixture design', href: 'https://github.example.com/pr/3' },
+        { label: 'Fixture build', href: 'https://github.example.com/pr/4' },
+      ],
+    },
+    setup: { title: 'Fixture setup', text: 'Fixture setup text.' },
     proofLink: {
       label: 'Fixture proof',
       href: 'https://github.example.com/proof',
