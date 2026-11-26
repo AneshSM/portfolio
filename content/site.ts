@@ -19,8 +19,15 @@ export const siteCopySchema = z.object({
   hero: z.object({
     /** One plain sentence on role and stack. */
     sentence: z.string().min(1),
-    resume: z.object({ label: z.string().min(1), href: z.string().min(1) }),
+    resume: z.object({
+      label: z.string().min(1),
+      href: z.string().min(1),
+      /** Saved-as name; the download attribute stops the PDF opening in the tab. */
+      fileName: z.string().regex(/^[\w-]+\.pdf$/),
+    }),
     emailLabel: z.string().min(1),
+    /** A copy button beside mailto: links, which fail without a mail app. */
+    copyEmail: z.object({ label: text, done: text }),
   }),
   projects: section.extend({
     buildingNow: z.string().min(1),
@@ -59,8 +66,13 @@ export const siteCopy = {
   hero: {
     sentence:
       'Full-stack engineer building web and mobile products in TypeScript, from React to PostgreSQL.',
-    resume: { label: 'Download résumé (PDF)', href: '/resume.pdf' },
+    resume: {
+      label: 'Download résumé (PDF)',
+      href: '/resume.pdf',
+      fileName: 'Anesh-Somanath-Majalikar-Resume.pdf',
+    },
     emailLabel: 'Email me',
+    copyEmail: { label: 'Copy email', done: 'Email address copied' },
   },
   projects: {
     id: 'projects',

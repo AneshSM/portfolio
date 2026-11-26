@@ -39,7 +39,7 @@ export function Projects({ resume, site: { projects: copy } }: SectionProps) {
           <summary className="min-h-6 cursor-pointer py-1 font-semibold text-ink-strong">
             {copy.earlierLearning}
           </summary>
-          <ul className="mt-4 space-y-2">
+          <ul className="mt-4 grid gap-x-10 gap-y-3 md:grid-cols-2">
             {archived.map((project) => (
               <li key={project.name}>
                 {project.url ? (
