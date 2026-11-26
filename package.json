@@ -12,7 +12,8 @@
     "e2e": "playwright test",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prebuild": "tsx scripts/build-resume.mts"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
+    "@react-pdf/renderer": "4.9.1",
     "@tailwindcss/turbopack": "4.3.5",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^8.0.0",
@@ -36,8 +38,10 @@
     "jsdom": "^31.0.1",
     "prettier": "^3.10.1",
     "tailwindcss": "4.3.5",
+    "tsx": "4.23.15",
     "typescript": "~6.0",
     "typescript-eslint": "^8.74.0",
+    "unpdf": "2.2.2",
     "vitest": "^5.1.2"
   },
   "engines": {
