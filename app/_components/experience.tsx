@@ -1,15 +1,6 @@
+import { formatDateRange } from '@/content/dates';
 import { Section } from './section';
 import type { SectionProps } from './types';
-
-const monthFormat = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  year: 'numeric',
-  timeZone: 'UTC',
-});
-
-/** "2023-02" → "Feb 2023". */
-const formatMonth = (isoMonth: string) =>
-  monthFormat.format(new Date(`${isoMonth}-01T00:00:00Z`));
 
 export function Experience({
   resume,
@@ -27,8 +18,7 @@ export function Experience({
                   {job.position}
                 </h3>
                 <p className="mt-1 text-ink-muted">
-                  {formatMonth(job.startDate)} –{' '}
-                  {job.endDate ? formatMonth(job.endDate) : copy.present}
+                  {formatDateRange(job.startDate, job.endDate, copy.present)}
                 </p>
                 <p className="text-ink-muted">{job.location}</p>
                 {job.recognition && <p className="mt-1">{job.recognition}</p>}

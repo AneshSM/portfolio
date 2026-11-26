@@ -1,9 +1,10 @@
+import { getArchivedProjects, getBuildingProjects } from '@/content/projects';
 import { Section } from './section';
 import type { SectionProps } from './types';
 
 export function Projects({ resume, site: { projects: copy } }: SectionProps) {
-  const building = resume.projects.filter((p) => p.status === 'building');
-  const archived = resume.projects.filter((p) => p.status === 'archived');
+  const building = getBuildingProjects(resume);
+  const archived = getArchivedProjects(resume);
 
   return (
     <Section id={copy.id} title={copy.title}>

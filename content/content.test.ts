@@ -19,6 +19,14 @@ describe('tracked content validation', () => {
 
     expect(() => parseTrackedContent(leaked)).toThrow();
   });
+
+  test('a track outside full-stack and agentic-ai fails', () => {
+    const mistagged = structuredClone(publicContent);
+    // @ts-expect-error tracks are a fixed set
+    mistagged.skills[0].tracks = ['full-stak'];
+
+    expect(() => parseTrackedContent(mistagged)).toThrow();
+  });
 });
 
 describe('capability-level content (ADR 0004)', () => {

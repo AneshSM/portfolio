@@ -20,15 +20,13 @@ import {
  */
 export type Edition = 'public' | 'private';
 
-type Tracked = TrackedContent;
 type Resolved<T, K extends keyof T> = Omit<T, K> & { [P in K]?: string };
 
-export type Basics = Resolved<Tracked['basics'], 'phone' | 'seeking'>;
-export type Work = Resolved<Tracked['work'][number], 'name'>;
-export type Project = Tracked['projects'][number];
-export type SkillGroup = Tracked['skills'][number];
-export type Education = Tracked['education'][number];
-export type Bullet = Work['highlights'][number];
+export type Basics = Resolved<TrackedContent['basics'], 'phone' | 'seeking'>;
+export type Work = Resolved<TrackedContent['work'][number], 'name'>;
+export type Project = TrackedContent['projects'][number];
+export type SkillGroup = TrackedContent['skills'][number];
+export type Education = TrackedContent['education'][number];
 
 export type Resume = {
   basics: Basics;
@@ -43,7 +41,7 @@ export type GetResumeOptions = {
   privateFile?: string;
 };
 
-const defaultPrivateFile = () =>
+const getDefaultPrivateFile = () =>
   path.join(process.cwd(), 'content', 'private.local.json');
 
 export function getResume(
@@ -56,7 +54,7 @@ export function getResume(
 ): Resume | null;
 export function getResume(
   edition: Edition,
-  { privateFile = defaultPrivateFile() }: GetResumeOptions = {},
+  { privateFile = getDefaultPrivateFile() }: GetResumeOptions = {},
 ): Resume | null {
   const tracked = parseTrackedContent(publicContent);
   if (edition === 'public') return resolve(tracked, {});
@@ -76,22 +74,22 @@ export function getSiteCopy(): SiteCopy {
   return siteCopySchema.parse(siteCopy);
 }
 
-type Field = Tracked['basics']['phone'];
+type Field = TrackedContent['basics']['phone'];
 
-const fill = (field: Field, privateValue: string | undefined) =>
+const resolveField = (field: Field, privateValue: string | undefined) =>
   field.visibility === 'public' ? field.value : privateValue;
 
-function resolve(tracked: Tracked, values: PrivateValues): Resume {
+function resolve(tracked: TrackedContent, values: PrivateValues): Resume {
   return {
     ...tracked,
     basics: {
       ...tracked.basics,
-      phone: fill(tracked.basics.phone, values.basics?.phone),
-      seeking: fill(tracked.basics.seeking, values.basics?.seeking),
+      phone: resolveField(tracked.basics.phone, values.basics?.phone),
+      seeking: resolveField(tracked.basics.seeking, values.basics?.seeking),
     },
     work: tracked.work.map((job) => ({
       ...job,
-      name: fill(job.name, values.work?.[job.id]?.name),
+      name: resolveField(job.name, values.work?.[job.id]?.name),
     })),
   };
 }

@@ -1,7 +1,7 @@
-import { alt as socialAlt, renderSocialImage } from './_og/social-image';
+import { renderSocialImage, socialImageSize } from './_og/social-image';
 
-export const alt = socialAlt;
-export const size = { width: 1200, height: 630 };
+export { alt } from './_og/social-image';
+export const size = socialImageSize;
 export const contentType = 'image/png';
 
 export default function Image() {

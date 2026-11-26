@@ -12,7 +12,7 @@ const field = z.discriminatedUnion('visibility', [
   z.object({ visibility: z.literal('private') }).strict(),
 ]);
 
-const tracks = z.array(z.string().min(1));
+const tracks = z.array(z.enum(['full-stack', 'agentic-ai']));
 const isoMonth = z.string().regex(/^\d{4}-\d{2}$/, 'expected YYYY-MM');
 const url = z.url();
 

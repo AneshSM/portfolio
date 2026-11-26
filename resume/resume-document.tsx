@@ -7,7 +7,10 @@ import {
   View,
 } from '@react-pdf/renderer';
 import type { ReactNode } from 'react';
-import type { Resume, Work } from '@/content';
+import type { Resume } from '@/content';
+import { formatDateRange } from '@/content/dates';
+import { getBuildingProjects } from '@/content/projects';
+import { listResumeProfileUrls, stripUrlScheme } from './contact';
 
 /**
  * The résumé layout (ADR 0002): one page, single column, standard headings,
@@ -19,31 +22,6 @@ import type { Resume, Work } from '@/content';
 // Hyphenation splits words across lines, which breaks extracted text for
 // applicant tracking systems. Keep every word whole.
 Font.registerHyphenationCallback((word) => [word]);
-
-const months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-const month = (isoMonth: string) => {
-  const [year, m] = isoMonth.split('-');
-  return `${months[Number(m) - 1]} ${year}`;
-};
-
-const dates = (job: Work) =>
-  `${month(job.startDate)} – ${job.endDate ? month(job.endDate) : 'Present'}`;
-
-const RESUME_NETWORKS = ['LinkedIn', 'GitHub'];
 
 const styles = StyleSheet.create({
   page: {
@@ -92,18 +70,19 @@ function Bullet({ children }: { children: string }) {
   );
 }
 
-export function ResumeDocument({ resume }: { resume: Resume }) {
+export function ResumeDocument({
+  resume,
+  presentLabel,
+}: {
+  resume: Resume;
+  /** End date shown for a current role; the site's label (#5). */
+  presentLabel: string;
+}) {
   const { basics } = resume;
-  const bare = (url: string) => url.replace(/^https:\/\/(www\.)?/, '');
   // Two fixed lines, so the contact details never wrap mid-line.
   const contact = [
     [basics.location.line, basics.phone, basics.email],
-    [
-      bare(basics.url),
-      ...basics.profiles
-        .filter((profile) => RESUME_NETWORKS.includes(profile.network))
-        .map((profile) => bare(profile.url)),
-    ],
+    [stripUrlScheme(basics.url), ...listResumeProfileUrls(basics)],
   ].map((line) => line.filter(Boolean).join('  ·  '));
 
   return (
@@ -140,7 +119,9 @@ export function ResumeDocument({ resume }: { resume: Resume }) {
                   {job.name ? `, ${job.name}` : ''}
                   {` · ${job.location}`}
                 </Text>
-                <Text>{dates(job)}</Text>
+                <Text>
+                  {formatDateRange(job.startDate, job.endDate, presentLabel)}
+                </Text>
               </View>
               {job.recognition ? <Text>{job.recognition}</Text> : null}
               {job.highlights.map((highlight) => (
@@ -151,20 +132,18 @@ export function ResumeDocument({ resume }: { resume: Resume }) {
         </Section>
 
         <Section title="Projects">
-          {resume.projects
-            .filter((project) => project.status === 'building')
-            .map((project) => (
-              <View key={project.name} style={styles.entry} wrap={false}>
-                <Text>
-                  <Text style={styles.bold}>{project.name}</Text>
-                  {' (building now)'}
-                </Text>
-                <Text>{project.description}</Text>
-                {project.highlights.map((highlight) => (
-                  <Bullet key={highlight.text}>{highlight.text}</Bullet>
-                ))}
-              </View>
-            ))}
+          {getBuildingProjects(resume).map((project) => (
+            <View key={project.name} style={styles.entry} wrap={false}>
+              <Text>
+                <Text style={styles.bold}>{project.name}</Text>
+                {' (building now)'}
+              </Text>
+              <Text>{project.description}</Text>
+              {project.highlights.map((highlight) => (
+                <Bullet key={highlight.text}>{highlight.text}</Bullet>
+              ))}
+            </View>
+          ))}
         </Section>
 
         <Section title="Skills">

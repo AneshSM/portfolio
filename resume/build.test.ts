@@ -2,9 +2,9 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { extractText } from 'unpdf';
 import { afterEach, expect, test } from 'vitest';
 import { buildPrivateResume, buildPublicResume } from './build';
+import { readPdfText } from './check';
 
 const fixtures = path.join(__dirname, '..', 'content', '__fixtures__');
 const fixture = path.join(fixtures, 'private.fixture.json');
@@ -16,12 +16,8 @@ const tempOut = () => {
   return path.join(dir, 'nested', 'resume.pdf');
 };
 
-const textOf = async (file: string) => {
-  const { text } = await extractText(new Uint8Array(readFileSync(file)), {
-    mergePages: true,
-  });
-  return text.replace(/\s+/g, ' ');
-};
+const textOf = async (file: string) =>
+  (await readPdfText(readFileSync(file))).text;
 
 test('writes a checked public résumé PDF', async () => {
   const outFile = tempOut();
