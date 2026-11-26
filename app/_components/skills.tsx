@@ -4,7 +4,7 @@ import type { SectionProps } from './types';
 export function Skills({ resume, site: { skills: copy } }: SectionProps) {
   return (
     <Section id={copy.id} title={copy.title}>
-      <div className="grid gap-8 sm:grid-cols-2">
+      <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
         {resume.skills.map((group) => (
           <div key={group.name}>
             <h3 className="text-lg font-semibold">{group.name}</h3>

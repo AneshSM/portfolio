@@ -26,7 +26,7 @@ export function SitePage({ resume, site }: SectionProps) {
       >
         {site.skipLink}
       </a>
-      <header className="mx-auto w-full max-w-3xl px-6 pt-6">
+      <header className="mx-auto w-full max-w-6xl px-6 pt-6 lg:px-10">
         <nav aria-label={site.navLabel}>
           <ul className="flex flex-wrap gap-x-6 gap-y-1 text-sm font-semibold text-ink-strong">
             {sections.map(({ id, title }) => (
@@ -45,7 +45,7 @@ export function SitePage({ resume, site }: SectionProps) {
       <main
         id={MAIN_ID}
         tabIndex={-1}
-        className="mx-auto w-full max-w-3xl flex-1 px-6 pb-24"
+        className="mx-auto w-full max-w-6xl flex-1 px-6 pb-24 lg:px-10"
       >
         <Hero resume={resume} site={site} />
         <Projects resume={resume} site={site} />
