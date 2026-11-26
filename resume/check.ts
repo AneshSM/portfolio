@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { extractText, getMeta } from 'unpdf';
 import type { Resume } from '@/content';
 import { getBuildingProjects } from '@/content/projects';
+import { listResumeProfileUrls, stripUrlScheme } from './contact';
 
 /**
  * Build checks for a résumé PDF (ADR 0002). Each returns a readable problem;
@@ -106,9 +107,10 @@ function findOrderProblems(text: string, expected: string[]): string[] {
 }
 
 /**
- * The text a reader (or an ATS) should meet, top to bottom. Private fields
- * (phone, seeking line, employer names) are expected only when the edition
- * has them, so the private PDF is checked for them too.
+ * The text a reader (or an ATS) should meet, top to bottom: the header and
+ * contact block, then every section. Private fields (phone, seeking line,
+ * employer names) are expected only when the edition has them, so the
+ * private PDF is checked for them too.
  */
 export function resumeTextInOrder(resume: Resume): string[] {
   const { basics } = resume;
@@ -117,7 +119,12 @@ export function resumeTextInOrder(resume: Resume): string[] {
   return [
     basics.name,
     basics.label,
-    ...keepDefined(basics.phone, basics.seeking),
+    basics.location.line,
+    ...keepDefined(basics.phone),
+    basics.email,
+    stripUrlScheme(basics.url),
+    ...listResumeProfileUrls(basics),
+    ...keepDefined(basics.seeking),
     'Summary',
     basics.summary,
     'Experience',

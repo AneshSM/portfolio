@@ -1,9 +1,13 @@
 // @vitest-environment node
 import path from 'node:path';
-import { extractText } from 'unpdf';
 import { beforeAll, describe, expect, test } from 'vitest';
 import { getResume } from '@/content';
-import { checkResumePdf, privateValuesIn, resumeTextInOrder } from './check';
+import {
+  checkResumePdf,
+  privateValuesIn,
+  readPdfText,
+  resumeTextInOrder,
+} from './check';
 import { renderResumePdf } from './render';
 
 const fixture = path.join(
@@ -14,20 +18,13 @@ const fixture = path.join(
   'private.fixture.json',
 );
 
-const textOf = async (pdf: Uint8Array) => {
-  const { text } = await extractText(new Uint8Array(pdf), {
-    mergePages: true,
-  });
-  return text.replace(/\s+/g, ' ');
-};
-
 describe('renderResumePdf', () => {
   let publicText: string;
 
   beforeAll(async () => {
-    publicText = await textOf(
+    ({ text: publicText } = await readPdfText(
       await renderResumePdf(getResume('public', { privateFile: fixture })),
-    );
+    ));
   });
 
   test('public résumé has selectable text with the standard headings in order', () => {
@@ -69,6 +66,38 @@ describe('checkResumePdf', () => {
       'text out of order: "Experience" should come after "Education"',
       'text missing: "Courses"',
     ]);
+  });
+
+  test('expects the contact block between the header and the Summary', () => {
+    const resume = getResume('public');
+    const expected = resumeTextInOrder(resume);
+    const contact = expected.slice(
+      expected.indexOf(resume.basics.label) + 1,
+      expected.indexOf('Summary'),
+    );
+
+    expect(contact).toEqual([
+      resume.basics.location.line,
+      resume.basics.email,
+      'aneshsm-portfolio.vercel.app',
+      'linkedin.com/in/anesh-somanath-majalikar-13666b222',
+      'github.com/AneshSM',
+    ]);
+  });
+
+  test('reports a contact detail the PDF does not show', async () => {
+    const resume = getResume('public');
+    const moved = {
+      ...resume,
+      basics: { ...resume.basics, email: 'someone-else@example.com' },
+    };
+
+    const problems = await checkResumePdf(await renderResumePdf(resume), {
+      inOrder: resumeTextInOrder(moved),
+      forbidden: [],
+    });
+
+    expect(problems).toEqual(['text missing: "someone-else@example.com"']);
   });
 
   test('reports private values in the text', async () => {
