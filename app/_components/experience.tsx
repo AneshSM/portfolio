@@ -26,11 +26,11 @@ export function Experience({
                 <h3 id={titleId} className="text-xl font-semibold">
                   {job.position}
                 </h3>
-                <p className="mt-1">
+                <p className="mt-1 text-ink-muted">
                   {formatMonth(job.startDate)} –{' '}
                   {job.endDate ? formatMonth(job.endDate) : copy.present}
                 </p>
-                <p>{job.location}</p>
+                <p className="text-ink-muted">{job.location}</p>
                 {job.recognition && <p className="mt-1">{job.recognition}</p>}
                 <ul className="mt-3 list-disc space-y-2 pl-5">
                   {job.highlights.map((bullet) => (

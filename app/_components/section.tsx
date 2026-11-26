@@ -14,7 +14,7 @@ export function Section({
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className="scroll-mt-8 py-12"
+      className="scroll-mt-8 border-t border-rule/40 py-12"
     >
       <h2 id={`${id}-title`} className="text-2xl font-semibold tracking-tight">
         {title}

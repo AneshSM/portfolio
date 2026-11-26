@@ -10,8 +10,14 @@ export function Projects({ resume, site: { projects: copy } }: SectionProps) {
       {building.map((project, i) => {
         const titleId = `${copy.id}-building-${i}`;
         return (
-          <article key={project.name} aria-labelledby={titleId}>
-            <p className="text-sm font-medium uppercase">{copy.buildingNow}</p>
+          <article
+            key={project.name}
+            aria-labelledby={titleId}
+            className="rounded-lg bg-surface p-6"
+          >
+            <p className="font-hand text-xl text-ink-hand">
+              {copy.buildingNow}
+            </p>
             <h3 id={titleId} className="mt-1 text-xl font-semibold">
               {project.name}
             </h3>
@@ -29,7 +35,7 @@ export function Projects({ resume, site: { projects: copy } }: SectionProps) {
       })}
       {archived.length > 0 && (
         <details className="mt-8">
-          <summary className="cursor-pointer font-medium">
+          <summary className="min-h-6 cursor-pointer py-1 font-semibold text-ink-strong">
             {copy.earlierLearning}
           </summary>
           <ul className="mt-4 space-y-2">
