@@ -1,0 +1,11 @@
+{
+  "basics": {
+    "phone": "+00 00000 00000",
+    "seeking": "Example: the roles and places you are applying for"
+  },
+  "work": {
+    "software-engineer": { "name": "Example Employer" },
+    "associate-software-engineer": { "name": "Example Employer" },
+    "intern": { "name": "Example Employer" }
+  }
+}
