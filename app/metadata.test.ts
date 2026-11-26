@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
-import { metadata } from './layout';
+// From site-metadata, not layout: next/font doesn't run under Vitest.
+import { siteMetadata as metadata } from './site-metadata';
 import robots from './robots';
 import sitemap from './sitemap';
 
